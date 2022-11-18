@@ -6,8 +6,8 @@ Description: Given a 2-dimensional array of (x,y)s, find a quadratic interpolati
 import numpy as np
 from math import floor
 from typing import Iterable, Tuple, Callable
-from itertools import pairwise
 from functools import partial
+from itertools import tee
 
 
 class Spline:
@@ -63,15 +63,20 @@ class Spline:
         end = self._start + (self._spacing * self._count)
         if x < self._start or x > end:
             raise ValueError(f"Value x={x} must be between {self._start} and {end}")
-        i = floor((x - self._start) // self._spacing)
+        i = floor((x - self._start) / self._spacing)
+        x -= i * self._spacing
         a = self._coefficients[i][0]
         b = self._coefficients[i][1]
         c = self._coefficients[i][2]
         return (a * x * x) + (b * x) + c
 
-    def ToFunc(self) -> Callable:
+    def ToFunc(self) -> Callable[[float], float]:
         """Returns an ordinary callable function of the interpolated Spline"""
-        return partial(self.At, self)
+        return partial(self.At)
+
+    def ToVectorizedFunc(self) -> Callable[[np.array], np.array]:
+        """Returns a vectorized callable function of the interpolated Spline"""
+        return np.vectorize(partial(self.At))
 
     def Coefficients(self) -> np.ndarray:
         """
@@ -86,8 +91,8 @@ def _isUniformSpacing(xs: np.array) -> bool:
     spacing = xs[1] - xs[0]
     if spacing <= 0:
         return False
-    for (a, _), (b, _) in pairwise(xs):
-        if b - a != spacing:
+    for a, b in pairwise(xs):
+        if b - a - spacing > 0.00001:
             return False
     return True
 
@@ -95,7 +100,7 @@ def _isUniformSpacing(xs: np.array) -> bool:
 def _generateSplineCoefficients(ys: np.array, spacing: float) -> np.ndarray:
     """Generates the coefficients a,b,c for each sub-interval of the spline"""
     n = len(ys)
-    coefs = np.ndarray(shape=(n-1, 3), dtype=float)
+    coefs = np.ndarray(shape=(n, 3), dtype=float)
     z_0, z_1 = 0, 0
     for i, (y_0, y_1) in enumerate(pairwise(ys)):
         z_1 = -z_0 + (2 * (y_1 - y_0) / spacing)
@@ -104,3 +109,11 @@ def _generateSplineCoefficients(ys: np.array, spacing: float) -> np.ndarray:
         coefs[i][2] = y_0
         z_0 = z_1
     return coefs
+
+
+def pairwise(iterable: Iterable):
+    """Emulates python.itertools.pairwise available in 3.10"""
+    # From https://docs.python.org/3/library/itertools.html#itertools.pairwise
+    a, b = tee(iterable)
+    next(b, None)
+    return zip(a, b)

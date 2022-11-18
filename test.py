@@ -16,12 +16,16 @@ def TestSpline():
     xs = numpy.linspace(0, 5, 10)
     ys = numpy.sin(xs)
 
-    spline = Spline.FromArrays(xs, ys).ToFunc()
-    inter_xs = numpy.linspace(0, 5, 100)
-    inter_ys = numpy.array(map(spline, inter_xs))
+    spline = Spline.FromArrays(xs, ys)
+    func = spline.ToFunc()
+    v_func = spline.ToVectorizedFunc()
 
-    plt.scatter(xs, ys)
-    plt.scatter(inter_xs, inter_ys)
+    _ = func(2.11)
+    inter_xs = numpy.linspace(0, 5, 100)
+    inter_ys = v_func(inter_xs)
+
+    plt.scatter(xs, ys, s=5)
+    plt.scatter(inter_xs, inter_ys, s=2)
     plt.show()
 
 
