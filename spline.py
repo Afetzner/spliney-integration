@@ -62,6 +62,7 @@ class Spline:
         if x < self._start or x > self._stop:
             raise ValueError(f"Value x={x} not in domain [{self._start}, {self._stop}]")
         i = self._intervals.searchsorted(x) - 1
+        i = 0 if i == -1 else i
         x -= self._intervals[i]
         a = self._coefficients[i][0]
         b = self._coefficients[i][1]
@@ -95,9 +96,10 @@ def _isMonotoneIncreasing(xs: np.array) -> bool:
 
 def _generateSplineCoefficients(xs: np.array, ys: np.array) -> np.ndarray:
     """Generates the coefficients a,b,c for each sub-interval of the spline"""
-    n = len(ys)
+    n = len(ys) - 1
     coefs = np.ndarray(shape=(n, 3), dtype=float)
-    z_0, z_1 = 0, 0
+    boundary_condition = (ys[1] - ys[0]) / (xs[1] - xs[0])
+    z_0, z_1 = boundary_condition, 0
     for i, ((x_0, y_0), (x_1, y_1)) in enumerate(pairwise(zip(xs, ys))):
         z_1 = -z_0 + (2 * (y_1 - y_0) / (x_1 - x_0))
         delta_z = z_1 - z_0
