@@ -88,10 +88,7 @@ class Spline:
 
 
 def _isMonotoneIncreasing(xs: np.array) -> bool:
-    for a, b in pairwise(xs):
-        if a >= b:
-            return False
-    return True
+    return not [1 for a, b in pairwise(xs) if a >= b]
 
 
 def _generateSplineCoefficients(xs: np.array, ys: np.array) -> np.ndarray:

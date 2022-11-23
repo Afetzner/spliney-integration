@@ -8,14 +8,13 @@ import numpy
 
 import topographyGenerator
 
-
 height = 1
 depth = 0.5
 slope = 0.25
 noise = 0.2
 samples = 100
 levels = 20
-isThreeD = False
+isThreeD = True
 
 
 def main():
