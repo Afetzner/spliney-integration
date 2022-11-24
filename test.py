@@ -50,21 +50,33 @@ def TestReaderWriter():
         return (100 * x) + y
     xs = range(5)
     ys = range(0, 10, 2)
+    zs = [f(x, y) for x, y in product(xs, ys)]
 
-    path = "data/writer_test.txt"
-    writer = Writer.fromFunction(f, xs, ys)
-    writer.write(path)
+    path1 = "data/writer_test1.csv"
+    writer1 = Writer.fromFunction(xs, ys, f)
+    writer1.write(path1)
 
-    reader = Reader(path)
-    reader.read()
-    read_xs, read_ys, read_zs = reader.toIterables()
-    read_xyzs = list(reader.toIterable())
+    path2 = "data/writer_test2.csv"
+    writer2 = Writer.fromIterables(xs, ys, zs)
+    writer2.write(path2)
+
+    reader1 = Reader(path1)
+    reader1.read()
+    read_xs, read_ys, read_zs = reader1.toIterables()
+    read_xyzs = list(reader1.toIterable())
+    reader2 = Reader(path2)
+    reader2.read()
+    read2_xs, read2_ys, read2_zs = reader2.toIterables()
 
     do_break = False
-    for i, ((x0, y0), x1, y1, z1, (x2, y2, z2)) in enumerate(zip(product(xs, ys), read_xs, read_ys, read_zs, read_xyzs)):
+    for i, ((x0, y0), x1, y1, z1, (x2, y2, z2), x3, y3, z3) in \
+            enumerate(zip(product(xs, ys), read_xs, read_ys, read_zs, read_xyzs, read2_xs, read2_ys, read2_zs)):
         x0 = float(x0)
         y0 = float(y0)
         z0 = f(x0, y0)
+        x3 = float(x3)
+        y3 = float(y3)
+        z3 = f(x3, y3)
 
         if i in range(0, 15, 6):
             fmt = "{:3s}\t{:8s}\t{:8s}\t{:8s}\t{:8s}"
@@ -73,19 +85,20 @@ def TestReaderWriter():
             print(fmt.format(str(i), "orig", str(x0), str(y0), str(z0)))
             print(fmt.format(str(i), "iters", str(x1), str(y1), str(z1)))
             print(fmt.format(str(i), "iter", str(x2), str(y2), str(z2)))
+            print(fmt.format(str(i), "iter2", str(x3), str(y3), str(z3)))
             print()
 
-        def close(a, b, c):
+        def close(a, b, c, d):
             margin = 0.000001
-            return abs(a - b) < margin and abs(a - c) < margin and abs(b - c) < margin
+            return abs(a - b) < margin and abs(b - c) < margin and abs(d - c) < margin
 
-        if not close(x0, x1, x2):
+        if not close(x0, x1, x2, x3):
             print(f"Line {i} x's do not match (orig={x0}, toIter={x1}, toIters={x2}")
             do_break = True
-        if not close(y0, y1, y2):
+        if not close(y0, y1, y2, y3):
             print(f"Line {i} y's do not match (orig={y0}, toIter={y1}, toIters={y2}")
             do_break = True
-        if not close(z0, z1, z2):
+        if not close(z0, z1, z2, z3):
             print(f"Line {i} z's do not match (orig={z0}, toIter={z1}, toIters={z2}")
             do_break = True
         if do_break:

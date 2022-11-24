@@ -9,7 +9,7 @@ from typing import Callable
 from perlin_noise import PerlinNoise
 
 
-def volcano_topography(height: float, cavity_depth: float, slope: float, noise: float) \
+def volcanoTopography(height: float, cavity_depth: float, slope: float, noise: float) \
         -> Callable[[float, float], float]:
     """
     Generates a rough, volcano-like topography over the domain [0, 1]x[0, 1]
@@ -19,8 +19,8 @@ def volcano_topography(height: float, cavity_depth: float, slope: float, noise: 
     :param noise: The degree of Perlin-noise to be added, greater factor -> rougher
     :return: A function that gives the height of the volcano  at (x, y)
     """
-    _noise = perlin_noise(noise)
-    _base_shape = base_shape(height, cavity_depth, slope)
+    _noise = perlinNoise(noise)
+    _base_shape = baseShape(height, cavity_depth, slope)
     offset = 0.5
     scale = 2
 
@@ -32,7 +32,7 @@ def volcano_topography(height: float, cavity_depth: float, slope: float, noise: 
     return noisy_mountain
 
 
-def base_shape(height: float, cavity_depth: float, slope: float) \
+def baseShape(height: float, cavity_depth: float, slope: float) \
         -> Callable[[float, float], float]:
     """
     Generates a cone-shaped surface with a centered cavity, like a volcano, with slope
@@ -44,8 +44,8 @@ def base_shape(height: float, cavity_depth: float, slope: float) \
     if slope < 0:
         raise ValueError(f"Base-shape cavity slope cannot be negative ({slope})")
 
-    mountain = functools.partial(two_d_cone, height=height, narrowness=1)
-    cavity = functools.partial(two_d_cone, height=height - cavity_depth, narrowness=10)
+    mountain = functools.partial(TwoDCone, height=height, narrowness=1)
+    cavity = functools.partial(TwoDCone, height=height - cavity_depth, narrowness=10)
 
     def volcano_shape(x: float, y: float) -> float:
         return mountain(x, y) - cavity(x, y) - (slope * (x + y))
@@ -53,7 +53,7 @@ def base_shape(height: float, cavity_depth: float, slope: float) \
     return volcano_shape
 
 
-def two_d_cone(x: float, y: float, height: float, narrowness: float) -> float:
+def TwoDCone(x: float, y: float, height: float, narrowness: float) -> float:
     """
     Generates a rounded cone shape like exp(-x^2 - y^2)
     """
@@ -64,7 +64,7 @@ def two_d_cone(x: float, y: float, height: float, narrowness: float) -> float:
     return height * math.exp(-narrowness * ((x * x) + (y * y)))
 
 
-def perlin_noise(factor: float) -> Callable[[float, float], float]:
+def perlinNoise(factor: float) -> Callable[[float, float], float]:
     """
     Generates continuous pseudo-random data at any point (x, y)
     """

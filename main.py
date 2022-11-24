@@ -4,32 +4,19 @@ Date: 11/18/2022
 Description: Compare methods of integrating 3D volumes using splines and interpolation
 """
 import matplotlib.pyplot as plt
-import numpy
 
-import topographyGenerator
-
-height = 1
-depth = 0.5
-slope = 0.25
-noise = 0.2
-samples = 100
-levels = 20
-isThreeD = True
+from readerWriter import Reader
+import dataGenerator
 
 
 def main():
-    # Generate the topography of the mountain
-    topography_gen = topographyGenerator.volcano_topography(height, depth, slope, noise)
-    topography = numpy.vectorize(topography_gen)
-
-    # Evaluate the topography height at every position
-    x = numpy.linspace(0, 1, samples)
-    y = numpy.linspace(0, 1, samples)
-    xy_mesh = numpy.meshgrid(x, y, sparse=True)
-    z = topography(*xy_mesh)
+    reader = Reader(dataGenerator.mountainPath)
+    x, y, z = reader.read().toArrays()
+    levels = 20
+    is_three_d = True
 
     # Plot the topography
-    if not isThreeD:
+    if not is_three_d:
         plt.contourf(x, y, z, levels=levels)
         plt.axis('scaled')
         plt.colorbar()
