@@ -8,14 +8,16 @@ import matplotlib.pyplot as plt
 from itertools import product
 
 from spline import Spline
-from integration import IntegrateSpline
+from integration import IntegrateSpline, IntegrateSimpsons
 from readerWriter import Writer, Reader
+from utils import pairwise, sets_of_n, is_evenly_spaced
 
 
 def main():
     # TestSpline()
-    # TestIntegration()
-    TestReaderWriter()
+    TestIntegration()
+    # TestReaderWriter()
+    # TestUtils()
 
 
 def TestSpline():
@@ -40,9 +42,14 @@ def TestIntegration():
     spline = Spline.FromArrays(xs, ys)
     integral = IntegrateSpline(spline)
     expected = 1 - np.cos(5)  # ~=0.71634
-    print("Integration")
+    print("Spline Integration")
     print(f"Expected={expected}")
     print(f"Actual  ={integral}")
+
+    integral = IntegrateSimpsons(xs, ys)
+    print("\nSimpson's Rule Integration")
+    print(f"Expected={expected}")
+    print(f"Actual  ={integral}\n\n")
 
 
 def TestReaderWriter():
@@ -106,6 +113,51 @@ def TestReaderWriter():
 
     if not do_break:
         print("All read lines match")
+
+
+def TestUtils():
+    any_fail = False
+
+    # Test pairwise
+    lst = [0, 1, 2, 3, 4, 5]
+    expected = [(0, 1), (1, 2), (2, 3), (3, 4), (4, 5)]
+    result = list(pairwise(lst))
+    if expected != result:
+        print(f"pairwise failed. Expected {expected}, got {result}")
+        any_fail = True
+
+    # Test sets_of_n
+    lst = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+    expected = [(0, 1, 2), (3, 4, 5), (6, 7, 8)]
+    result = list(sets_of_n(lst, 3))
+    if expected != result:
+        print(f"sets_of_n failed. Expected {expected}, got {result}")
+        any_fail = True
+
+    lst = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+    expected = [(0, 1), (2, 3), (4, 5), (6, 7), (8, None)]
+    result = list(sets_of_n(lst, 2))
+    if expected != result:
+        print(f"sets_of_n failed. Expected {expected}, got {result}")
+        any_fail = True
+
+    # Test is_evenly_spaced
+    lst = [0, 1, 2, 3, 4, 5, 6]
+    expected = (True, 1)
+    result = is_evenly_spaced(lst)
+    if expected != result:
+        print(f"is_evenly_spaced failed. Expected {expected}, got {result}")
+        any_fail = True
+
+    lst = [0, 1, 2, 7, 8, 9]
+    expected = (False, 0)
+    result = is_evenly_spaced(lst)
+    if expected != result:
+        print(f"is_evenly_spaced failed. Expected {expected}, got {result}")
+        any_fail = True
+
+    if not any_fail:
+        print("All utils tests passed")
 
 
 if __name__ == '__main__':
