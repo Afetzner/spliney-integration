@@ -6,11 +6,18 @@ Description: Compare methods of integrating 3D volumes using splines and interpo
 import matplotlib.pyplot as plt
 
 from readerWriter import Reader
-import dataGenerator
+from dataGenerator import mountainPath, waveletPath, gaussPath, asymmetricPath
 
 
 def main():
-    reader = Reader(dataGenerator.mountainPath)
+    plot(mountainPath)
+    plot(waveletPath)
+    plot(gaussPath)
+    plot(asymmetricPath)
+
+
+def plot(path):
+    reader = Reader(path)
     x, y, z = reader.read().toArrays()
     levels = 20
     is_three_d = True

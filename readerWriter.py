@@ -67,7 +67,7 @@ class Writer:
         long_zs = map(lambda t: zs[t], product(range(nx), range(ny)))
         return cls(xs, ys, long_zs)
 
-    def write(self, path: str, decimals: int = 6):
+    def write(self, path: str, decimals: int = 14):
         with open(path, "w") as f:
             for (x, y), z in zip(product(self._xs, self._ys), self._source):
                 print("{:.{d}f},{:.{d}f},{:.{d}f}".format(x, y, z, d=decimals), file=f)
