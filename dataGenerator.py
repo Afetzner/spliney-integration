@@ -50,16 +50,16 @@ def generateMountainData(do_write: bool = False):
 
 def generateGaussianData(do_write: bool = False):
     # Expected integral = 1
-    const = math.e / (2 * math.pi * (math.e - 2))
+    const = 1 / math.pi
 
     def gaussian_curve(x: float, y: float) -> float:
-        r = x**2 + y**2
-        return np.exp(-r) * const * (r <= 1)
+        r = (x * x) + (y * y)
+        return np.exp(-r) * const
 
     gauss = np.vectorize(gaussian_curve)
     samples = 100
-    xs = np.linspace(-1, 1, samples)
-    ys = np.linspace(-1, 1, samples)
+    xs = np.linspace(-10, 10, samples)
+    ys = np.linspace(-10, 10, samples)
     xy_mesh = np.meshgrid(xs, ys, sparse=True)
     zs = gauss(*xy_mesh)
 
@@ -70,12 +70,12 @@ def generateGaussianData(do_write: bool = False):
 
 
 def generateWaveletData(do_write: bool = False):
-    # Expected integral = 1?
+    # Integral unknown
     const = 4 * math.pi
 
     def wavelet_curve(x: float, y: float) -> float:
-        r = x**2 + y**2
-        return np.sin(const * r) / (const * r)
+        r = (x * x) + (y * y)
+        return (r <= 1) * np.sin(const * r) / (const * r)
 
     wave = np.vectorize(wavelet_curve)
     samples = 100
@@ -92,9 +92,9 @@ def generateWaveletData(do_write: bool = False):
 
 def generateAsymmetricData(do_write: bool = False):
     # Expected integral = 1
-    const1 = 4 / (1 - np.exp(-2))
+    const1 = 0.25 / (1 - np.exp(-2))
     const2 = 4 * math.pi
-    const3 = 4 / const2
+    const3 = 1 / math.pi
 
     def f(x: float) -> float:
         return (np.exp(-x) * const1) + (np.sin(const2 * x) * const3)
@@ -104,8 +104,8 @@ def generateAsymmetricData(do_write: bool = False):
 
     func = np.vectorize(lambda x, y: f(x) + g(y))
     samples = 100
-    xs = np.linspace(-1, 1, samples)
-    ys = np.linspace(-1, 1, samples)
+    xs = np.linspace(0, 2, samples)
+    ys = np.linspace(0, 2, samples)
     xy_mesh = np.meshgrid(xs, ys, sparse=True)
     zs = func(*xy_mesh)
 

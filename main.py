@@ -15,6 +15,7 @@ functions = [("gauss", dataGenerator.generateGaussianData, dataGenerator.gaussPa
 
 
 def main():
+    plot_functions()
     integrate_functions()
 
 
