@@ -1,23 +1,25 @@
 """
 Author: Alex Fetzner
 Date: 11/18/2022
-Description: Write quick, manual tests for functions you wrote
+Description: Quick, manual tests for functions
 """
 import numpy as np
 import matplotlib.pyplot as plt
 from itertools import product
 
 from spline import Spline
-from integration import IntegrateSpline, IntegrateSimpsons
+from integration import integrateSpline, integrateSimpsons
 from readerWriter import Writer, Reader
 from utils import pairwise, sets_of_n, is_evenly_spaced
+from multiIntegration import multiIntegrate
 
 
 def main():
     # TestSpline()
-    TestIntegration()
+    # TestIntegration()
     # TestReaderWriter()
     # TestUtils()
+    TestMultiIntegration()
 
 
 def TestSpline():
@@ -40,16 +42,35 @@ def TestIntegration():
     xs = np.linspace(0, 5, 100)
     ys = np.sin(xs)
     spline = Spline.FromArrays(xs, ys)
-    integral = IntegrateSpline(spline)
+    integral = integrateSpline(spline)
     expected = 1 - np.cos(5)  # ~=0.71634
     print("Spline Integration")
     print(f"Expected={expected}")
     print(f"Actual  ={integral}")
 
-    integral = IntegrateSimpsons(xs, ys)
+    integral = integrateSimpsons(xs, ys)
     print("\nSimpson's Rule Integration")
     print(f"Expected={expected}")
     print(f"Actual  ={integral}\n\n")
+
+
+def TestMultiIntegration():
+    xs = np.linspace(0, 1, 100)
+    ys = np.linspace(0, 1, 100)
+    xy_mesh = np.meshgrid(xs, ys)
+    plane = np.vectorize(lambda x, y: x+y)
+    zs = plane(*xy_mesh)
+
+    integral = multiIntegrate(xs, ys, zs)
+    integral_y_first = multiIntegrate(xs, ys, zs, y_first=True)
+    integral_simpsons = multiIntegrate(xs, ys, zs, use_simpsons=True)
+    integral_y_first_simpsons = multiIntegrate(xs, ys, zs, y_first=True, use_simpsons=True)
+
+    print("Multiple Integration")
+    print(f"Spline, x-first: {integral}")
+    print(f"Spline, y-first: {integral_y_first}")
+    print(f"Simpsons, x-first: {integral_simpsons}")
+    print(f"Simpsons, y-first: {integral_y_first_simpsons}\n")
 
 
 def TestReaderWriter():
@@ -158,6 +179,7 @@ def TestUtils():
 
     if not any_fail:
         print("All utils tests passed")
+    print()
 
 
 if __name__ == '__main__':

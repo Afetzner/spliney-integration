@@ -9,7 +9,22 @@ from spline import Spline
 from utils import sets_of_n, is_evenly_spaced
 
 
-def IntegrateSpline(spline: Spline, start: Optional[float] = None, stop: Optional[float] = None):
+def integrate(xs: np.array,
+              ys: np.array,
+              start: Optional[float] = None,
+              stop: Optional[float] = None,
+              use_simpsons: bool = False) -> float:
+    """Computes the numerical integration of a pair of arrays (x, y)"""
+    if use_simpsons:
+        return integrateSimpsons(xs, ys, start, stop)
+    else:
+        spline = Spline.FromArrays(xs, ys)
+        return integrateSpline(spline, start, stop)
+
+
+def integrateSpline(spline: Spline,
+                    start: Optional[float] = None,
+                    stop: Optional[float] = None) -> float:
     """Computes the 1D integral of quadratic spline function from start to stop"""
     lower, upper = spline.Domain()
     if start is None:
@@ -23,7 +38,7 @@ def IntegrateSpline(spline: Spline, start: Optional[float] = None, stop: Optiona
     delta_xs = np.diff(xs)
     coefs = spline.Coefficients()
     i = np.searchsorted(xs, start)   # lower sub interval index
-    j = np.searchsorted(xs, stop)    # upper sub interval index
+    j = np.searchsorted(xs, stop, side='right')    # upper sub interval index
 
     # sum of integrals of ax^2 terms
     a_terms = coefs.take(0, 1)[i:j]
@@ -40,7 +55,10 @@ def IntegrateSpline(spline: Spline, start: Optional[float] = None, stop: Optiona
     return integral
 
 
-def IntegrateSimpsons(xs: np.array, ys: np.array, start: Optional[float] = None, stop: Optional[float] = None):
+def integrateSimpsons(xs: np.array,
+                      ys: np.array,
+                      start: Optional[float] = None,
+                      stop: Optional[float] = None) -> float:
     """Integrate a list of data-points using simpson's rule"""
     if len(xs) != len(ys):
         raise ValueError(f"Dimension mismatch between xs ({len(xs)}) and ys ({len(ys)})")

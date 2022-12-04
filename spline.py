@@ -55,7 +55,7 @@ class Spline:
         stop = xs[-1]
         count = len(xs)
         coefs = _generateSplineCoefficients(xs, ys)
-        return Spline(xs, coefs, start, count, stop)
+        return Spline(xs, coefs, start, stop, count)
 
     def At(self, x: float) -> float:
         """Evaluates the spline at a point x"""

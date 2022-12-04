@@ -24,7 +24,7 @@ def main():
     pass
 
 
-def generateMountainData():
+def generateMountainData(do_write: bool = False):
     # integral unknown
     height = 1
     depth = 0.5
@@ -42,11 +42,13 @@ def generateMountainData():
     xy_mesh = np.meshgrid(xs, ys, sparse=True)
     zs = topography(*xy_mesh)
 
-    writer = Writer.fromArrays(xs, ys, zs)
-    writer.write(mountainPath)
+    if do_write:
+        writer = Writer.fromArrays(xs, ys, zs)
+        writer.write(mountainPath)
+    return xs, ys, zs
 
 
-def generateGaussianData():
+def generateGaussianData(do_write: bool = False):
     # Expected integral = 1
     const = math.e / (2 * math.pi * (math.e - 2))
 
@@ -61,11 +63,13 @@ def generateGaussianData():
     xy_mesh = np.meshgrid(xs, ys, sparse=True)
     zs = gauss(*xy_mesh)
 
-    writer = Writer.fromArrays(xs, ys, zs)
-    writer.write(gaussPath)
+    if do_write:
+        writer = Writer.fromArrays(xs, ys, zs)
+        writer.write(gaussPath)
+    return xs, ys, zs
 
 
-def generateWaveletData():
+def generateWaveletData(do_write: bool = False):
     # Expected integral = 1?
     const = 4 * math.pi
 
@@ -80,12 +84,14 @@ def generateWaveletData():
     xy_mesh = np.meshgrid(xs, ys, sparse=True)
     zs = wave(*xy_mesh)
 
-    writer = Writer.fromArrays(xs, ys, zs)
-    writer.write(waveletPath)
+    if do_write:
+        writer = Writer.fromArrays(xs, ys, zs)
+        writer.write(waveletPath)
+    return xs, ys, zs
 
 
-def generateAsymmetricData():
-    # Integral from 0<x<2 0<y<2 = 1
+def generateAsymmetricData(do_write: bool = False):
+    # Expected integral = 1
     const1 = 4 / (1 - np.exp(-2))
     const2 = 4 * math.pi
     const3 = 4 / const2
@@ -103,8 +109,10 @@ def generateAsymmetricData():
     xy_mesh = np.meshgrid(xs, ys, sparse=True)
     zs = func(*xy_mesh)
 
-    writer = Writer.fromArrays(xs, ys, zs)
-    writer.write(asymmetricPath)
+    if do_write:
+        writer = Writer.fromArrays(xs, ys, zs)
+        writer.write(asymmetricPath)
+    return xs, ys, zs
 
 
 if __name__ == '__main__':
