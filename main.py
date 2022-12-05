@@ -9,13 +9,13 @@ import dataGenerator
 from multiIntegration import multiIntegrate
 
 functions = [("gauss", dataGenerator.generateGaussianData, dataGenerator.gaussPath),
-             ("wavelet", dataGenerator.generateWaveletData, dataGenerator.waveletPath),
+             # ("wavelet", dataGenerator.generateWaveletData, dataGenerator.waveletPath),
              ("asymmetric", dataGenerator.generateAsymmetricData, dataGenerator.asymmetricPath),
              ("mountain", dataGenerator.generateMountainData, dataGenerator.mountainPath)]
 
 
 def main():
-    plot_functions()
+    # plot_functions()
     integrate_functions()
 
 
@@ -43,19 +43,26 @@ def plot_from_path(path):
 
 
 def integrate_functions():
+    do_write = True  # Set True to write data to file
     print("Multiple Integration")
     for name, generator, _ in functions:
-        xs, ys, zs = generator()
+        xs, ys, zs = generator(do_write = do_write)
         integral_x_first_spline = multiIntegrate(xs, ys, zs)
         integral_y_first_spline = multiIntegrate(xs, ys, zs, y_first=True)
         integral_x_first_simpsons = multiIntegrate(xs, ys, zs, use_simpsons=True)
         integral_y_first_simpsons = multiIntegrate(xs, ys, zs, y_first=True, use_simpsons=True)
 
         print(f"Function: {name}")
-        print(f"Spline, x-first: {integral_x_first_spline}")
-        print(f"Spline, y-first: {integral_y_first_spline}")
-        print(f"Simpsons, x-first: {integral_x_first_simpsons}")
-        print(f"Simpsons, y-first: {integral_y_first_simpsons}\n")
+        if name == "gauss" or name == "asymmetric":
+            print(f"Spline, x-first:   {integral_x_first_spline}    Error: {integral_x_first_spline - 1}")
+            print(f"Spline, y-first:   {integral_y_first_spline}    Error: {integral_y_first_spline - 1}")
+            print(f"Simpsons, x-first: {integral_x_first_simpsons}    Error: {integral_x_first_simpsons - 1}")
+            print(f"Simpsons, y-first: {integral_y_first_simpsons}    Error: {integral_y_first_simpsons - 1}\n")
+        else:
+            print(f"Spline, x-first:   {integral_x_first_spline}")
+            print(f"Spline, y-first:   {integral_y_first_spline}")
+            print(f"Simpsons, x-first: {integral_x_first_simpsons}")
+            print(f"Simpsons, y-first: {integral_y_first_simpsons}\n")
 
 
 if __name__ == '__main__':

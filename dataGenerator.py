@@ -14,6 +14,7 @@ mountainPath = "data/mountain.csv"
 gaussPath = "data/gauss.csv"
 waveletPath = "data/wavelet.csv"
 asymmetricPath = "data/asymmetric.csv"
+NUMBER_OF_SAMPLES = 61
 
 
 def main():
@@ -30,7 +31,7 @@ def generateMountainData(do_write: bool = False):
     depth = 0.5
     slope = 0.25
     noise = 0.2
-    samples = 100
+    samples = NUMBER_OF_SAMPLES
 
     # Generate the topography of the mountain
     topography_gen = volcanoTopography(height, depth, slope, noise)
@@ -57,7 +58,7 @@ def generateGaussianData(do_write: bool = False):
         return np.exp(-r) * const
 
     gauss = np.vectorize(gaussian_curve)
-    samples = 100
+    samples = NUMBER_OF_SAMPLES
     xs = np.linspace(-10, 10, samples)
     ys = np.linspace(-10, 10, samples)
     xy_mesh = np.meshgrid(xs, ys, sparse=True)
@@ -78,7 +79,7 @@ def generateWaveletData(do_write: bool = False):
         return (r <= 1) * np.sin(const * r) / (const * r)
 
     wave = np.vectorize(wavelet_curve)
-    samples = 100
+    samples = NUMBER_OF_SAMPLES
     xs = np.linspace(-1, 1, samples)
     ys = np.linspace(-1, 1, samples)
     xy_mesh = np.meshgrid(xs, ys, sparse=True)
@@ -103,7 +104,7 @@ def generateAsymmetricData(do_write: bool = False):
         return (y-1) * (y-1) * (2-y) * 0.375
 
     func = np.vectorize(lambda x, y: f(x) + g(y))
-    samples = 100
+    samples = NUMBER_OF_SAMPLES
     xs = np.linspace(0, 2, samples)
     ys = np.linspace(0, 2, samples)
     xy_mesh = np.meshgrid(xs, ys, sparse=True)
